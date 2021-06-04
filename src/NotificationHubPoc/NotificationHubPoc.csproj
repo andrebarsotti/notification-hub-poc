@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -7,9 +7,11 @@
       https://api.nuget.org/v3/index.json;
       https://f.feedz.io/featherhttp/framework/nuget/index.json
     </RestoreSources>
+    <UserSecretsId>f830d366-9cbf-4457-ba0a-b4dc124f1ef8</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="FeatherHttp" Version="0.1.83-alpha.g15473de7d1" />
+    <PackageReference Include="Microsoft.Azure.NotificationHubs" Version="4.1.0" />
   </ItemGroup>
 </Project>
 
