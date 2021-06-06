@@ -6,10 +6,8 @@ using Microsoft.Azure.NotificationHubs;
 using Microsoft.Azure.NotificationHubs.Messaging;
 using Microsoft.Extensions.Configuration;
 using System.Threading.Tasks;
-using System.Threading;
 using System.Text;
 using System;
-using System.Linq;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
@@ -17,6 +15,9 @@ using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Net.Http.Headers;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
 
 #region Application Start and Config
 var builder = WebApplication.CreateBuilder(args);
@@ -118,11 +119,20 @@ public class NotificationService : INotificationService
 }
 #endregion
 
+#region Model
+public class DeviceRegistration
+{
+  public string Platform { get; set; }
+  public string Handle { get; set; }
+  public string[] Tags { get; set; }
+}
+#endregion
+
 #region Controllers
 [Authorize]
 [ApiController]
 [Route("[controller]")]
-public class RegistroController : ControllerBase
+public class RegistroController: ControllerBase
 {
   private readonly INotificationHubClient hub;
 
@@ -161,17 +171,120 @@ public class RegistroController : ControllerBase
   }
 
   [HttpPut]
-  public Task<IActionResult> PutAsync()
+  public async Task<IActionResult> CreatesOrUpdatesARgistrationAsync(string id, DeviceRegistration deviceUpdate)
   {
-    throw new NotImplementedException();
+    RegistrationDescription registration = null;
+    switch (deviceUpdate.Platform)
+    {
+        case "mpns":
+            registration = new MpnsRegistrationDescription(deviceUpdate.Handle);
+            break;
+        case "wns":
+            registration = new WindowsRegistrationDescription(deviceUpdate.Handle);
+            break;
+        case "apns":
+            registration = new AppleRegistrationDescription(deviceUpdate.Handle);
+            break;
+        case "fcm":
+            registration = new FcmRegistrationDescription(deviceUpdate.Handle);
+            break;
+        default:
+            return BadRequest();
+    }
+
+    registration.RegistrationId = id;
+    var username = User.Identity.Name;
+
+    // add check if user is allowed to add these tags
+    registration.Tags = new HashSet<string>(deviceUpdate.Tags);
+    registration.Tags.Add("username:" + username);
+
+    try
+    {
+      await hub.CreateOrUpdateRegistrationAsync(registration);
+    }
+    catch (MessagingException e)
+    {
+      ReturnGoneIfHubResponseIsGone(e);
+    }
+
+    return Ok();
   }
 
   [HttpDelete]
-  public Task<IActionResult> DeleteAsync()
+  public async Task<IActionResult> DeleteAsync(string id)
   {
-    throw new NotImplementedException();
+    await hub.DeleteRegistrationAsync(id);
+    return Ok();
   }
 
+  private static void ReturnGoneIfHubResponseIsGone(MessagingException e)
+  {
+    var webex = e.InnerException as WebException;
+    if (webex.Status == WebExceptionStatus.ProtocolError)
+    {
+      var response = (HttpWebResponse)webex.Response;
+      if (response.StatusCode == HttpStatusCode.Gone)
+        throw new HttpRequestException(HttpStatusCode.Gone.ToString());
+    }
+  }
+
+}
+
+[Authorize]
+[ApiController]
+[Route("[controller]")]
+public class NotificationsController: ControllerBase
+{
+  private readonly INotificationService _service;
+
+  public NotificationsController(INotificationService service)
+  {
+    _service = service;
+  }
+
+  [HttpPost]
+  public async Task<IActionResult> Post(string pns, [FromBody]string message, string to_tag)
+  {
+    var user = User.Identity.Name;
+    string[] userTag = new string[2];
+    userTag[0] = "username:" + to_tag;
+    userTag[1] = "from:" + user;
+
+    Microsoft.Azure.NotificationHubs.NotificationOutcome outcome = null;
+    HttpStatusCode ret = HttpStatusCode.InternalServerError;
+
+    switch (pns.ToLower())
+    {
+        case "wns":
+            // Windows 8.1 / Windows Phone 8.1
+            var toast = @"<toast><visual><binding template=""ToastText01""><text id=""1"">" + 
+                        "From " + user + ": " + message + "</text></binding></visual></toast>";
+            outcome = await _service.Hub.SendWindowsNativeNotificationAsync(toast, userTag);
+            break;
+        case "apns":
+            // iOS
+            var alert = "{\"aps\":{\"alert\":\"" + "From " + user + ": " + message + "\"}}";
+            outcome = await _service.Hub.SendAppleNativeNotificationAsync(alert, userTag);
+            break;
+        case "fcm":
+            // Android
+            var notif = "{ \"data\" : {\"message\":\"" + "From " + user + ": " + message + "\"}}";
+            outcome = await _service.Hub.SendFcmNativeNotificationAsync(notif, userTag);
+            break;
+    }
+
+    if (outcome != null)
+    {
+        if (!((outcome.State == Microsoft.Azure.NotificationHubs.NotificationOutcomeState.Abandoned) ||
+            (outcome.State == Microsoft.Azure.NotificationHubs.NotificationOutcomeState.Unknown)))
+        {
+            ret = HttpStatusCode.OK;
+        }
+    }
+
+    return StatusCode((int)ret);
+  }  
 }
 
 #endregion
