@@ -149,47 +149,47 @@ public class RegistroController: ControllerBase
     // make sure there are no existing registrations for this push handle (used for iOS and Android)
     if (handle != null)
     {
-        var registrations = await hub.GetRegistrationsByChannelAsync(handle, 100);
+      var registrations = await hub.GetRegistrationsByChannelAsync(handle, 100);
 
-        foreach (RegistrationDescription registration in registrations)
+      foreach (RegistrationDescription registration in registrations)
+      {
+        if (newRegistrationId == null)
         {
-            if (newRegistrationId == null)
-            {
-                newRegistrationId = registration.RegistrationId;
-            }
-            else
-            {
-                await hub.DeleteRegistrationAsync(registration);
-            }
+          newRegistrationId = registration.RegistrationId;
         }
+        else
+        {
+          await hub.DeleteRegistrationAsync(registration);
+        }
+      }
     }
 
     if (newRegistrationId == null) 
-        newRegistrationId = await hub.CreateRegistrationIdAsync();
+      newRegistrationId = await hub.CreateRegistrationIdAsync();
 
     return Ok(newRegistrationId);
   }
 
   [HttpPut]
-  public async Task<IActionResult> CreatesOrUpdatesARgistrationAsync(string id, DeviceRegistration deviceUpdate)
+  public async Task<IActionResult> CreatesOrUpdatesARgistrationAsync(string id, [FromBody] DeviceRegistration deviceUpdate)
   {
     RegistrationDescription registration = null;
     switch (deviceUpdate.Platform)
     {
-        case "mpns":
-            registration = new MpnsRegistrationDescription(deviceUpdate.Handle);
-            break;
-        case "wns":
-            registration = new WindowsRegistrationDescription(deviceUpdate.Handle);
-            break;
-        case "apns":
-            registration = new AppleRegistrationDescription(deviceUpdate.Handle);
-            break;
-        case "fcm":
-            registration = new FcmRegistrationDescription(deviceUpdate.Handle);
-            break;
-        default:
-            return BadRequest();
+      case "mpns":
+        registration = new MpnsRegistrationDescription(deviceUpdate.Handle);
+        break;
+      case "wns":
+        registration = new WindowsRegistrationDescription(deviceUpdate.Handle);
+        break;
+      case "apns":
+        registration = new AppleRegistrationDescription(deviceUpdate.Handle);
+        break;
+      case "fcm":
+        registration = new FcmRegistrationDescription(deviceUpdate.Handle);
+        break;
+      default:
+        return BadRequest();
     }
 
     registration.RegistrationId = id;
