@@ -7,7 +7,7 @@ O código foi copiado e adaptado daquele disponível no tutorial da documentaç�
 # Pré-requisitos
 
 - Ter Docker instalado na máquina.
-- Ter o Andoid Studio instaldo na máquina.
+- Ter o Andoid Studio instalado na máquina.
 
 # Execução
 
