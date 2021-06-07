@@ -111,10 +111,14 @@ public class NotificationService : INotificationService
 {
   private readonly INotificationHubClient _hub;
 
-  public NotificationService(IConfiguration configuration)
+  public NotificationService(IConfiguration configuration,
+                            ILogger<NotificationService> logger)
   {
+    logger.LogInformation("Obtendo configurações...");
     var hubConfig = configuration.GetSection(nameof(AzureNotificationHub))
                                  .Get<AzureNotificationHub>();
+    logger.LogInformation($"Hub name => {hubConfig.HubName}");
+    logger.LogInformation($"Hub conSt => {hubConfig.ConnectionString}");
     _hub = NotificationHubClient.CreateClientFromConnectionString(hubConfig.ConnectionString,
                                                                   hubConfig.HubName);
   }

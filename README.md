@@ -11,17 +11,17 @@ O código foi copiado e adaptado daquele disponível no tutorial da documentaç�
 
 # Execução
 
-Editar o arquivo _docker-compose.yml_ e alterar as variáveis de ambiente abaixo para os valores correspondentes ao 
+Criar um arquivo _.env_ na raiz do projeto e incluir as linhas abaixo com os valores correspondentes ao 
 Azure Notification Hub.
 
-  ~~~ yaml
-        - AzureNotificationHub__ConnectionString=<connection string>
-        - AzureNotificationHub__HubName=<hub name>
+  ~~~ ini
+  HubName=<hub name>
+  HubConStr=<connection string default>
   ~~~
 
 Depois disso executar um o comando abaixo:
 
-  ~~~ bash
+  ~~~ shell
   docker-compose up -d 
   ~~~
 
