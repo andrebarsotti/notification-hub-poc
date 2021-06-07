@@ -22,7 +22,7 @@ Azure Notification Hub.
 Depois disso executar um o comando abaixo:
 
   ~~~ shell
-  docker-compose up -d 
+  docker-compose up -d --build
   ~~~
 
 # Fonte
