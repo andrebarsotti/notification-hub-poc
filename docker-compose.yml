@@ -5,11 +5,10 @@ services:
     build: .
     image: notificationhubpoc:latest
     environment:
-      Configuracao para log no ApplicationInsights
       # - AzureNotificationHub__ConnectionString=<connection string>
       # - AzureNotificationHub__HubName=<hub name>
-      - AzureNotificationHub__ConnectionString=<connection string>
-      - AzureNotificationHub__HubName=<hub name>
+      - AzureNotificationHub__ConnectionString=Endpoint=sb://comgas-dev-nh.servicebus.windows.net/;SharedAccessKeyName=DefaultFullSharedAccessSignature;SharedAccessKey=2jbx0VrS2mJq1gK2GDD8XSyw9F12Rlue6JP3QFF6Tf4=
+      - AzureNotificationHub__HubName=comgas-dev-nh
 
     ports:
       - "8080:80"

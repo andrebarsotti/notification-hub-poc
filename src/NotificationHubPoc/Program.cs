@@ -22,19 +22,23 @@ using System.Net.Http;
 #region Application Start and Config
 var builder = WebApplication.CreateBuilder(args);
 
-// configure basic authentication 
+builder.Services.AddControllers();
+
 builder.Services.AddAuthentication("BasicAuthentication")
                 .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication",
                                                                                     null);
 
 builder.Services.AddSingleton<INotificationService, NotificationService>();
 
-builder.Services.AddControllers();
-
 var app = builder.Build();
 app.MapControllers();
 
 app.MapGet("/", async http => await http.Response.WriteAsync("The app is online."));
+
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+
 await app.RunAsync();
 #endregion
 
@@ -75,7 +79,7 @@ public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSc
           var username = credentials[0];
           var password = credentials[1];
 
-        if (VerifyUserAndPwd(username, password))
+        if (!VerifyUserAndPwd(username, password))
             return Task.FromResult(AuthenticateResult.Fail("Invalid Username or Password"));
 
         var claims = new[] {
@@ -132,11 +136,11 @@ public class DeviceRegistration
 [Authorize]
 [ApiController]
 [Route("[controller]")]
-public class RegistroController: ControllerBase
+public class RegistrationController: ControllerBase
 {
   private readonly INotificationHubClient hub;
 
-  public RegistroController(INotificationService service)
+  public RegistrationController(INotificationService service)
   {
       hub = service.Hub;
   }
