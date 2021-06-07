@@ -11,12 +11,20 @@ O código foi copiado e adaptado daquele disponível no tutorial da documentaç�
 
 # Execução
 
-Para subir a api executar no diretório raiz executar
+Editar o arquivo _docker-compose.yml_ e alterar as variáveis de ambiente abaixo para os valores correspondentes ao 
+Azure Notification Hub.
 
-~~ bash
+~~~ yaml
+      - AzureNotificationHub__ConnectionString=<connection string>
+      - AzureNotificationHub__HubName=<hub name>
+~~~
+
+Depois disso executar um o comando abaixo:
+
+~~~ bash
 docker-compose up -d 
-~~
+~~~
 
 #Fonte
 
-https://docs.microsoft.com/en-us/azure/notification-hubs/push-notifications-android-specific-users-firebase-cloud-messaging#create-the-android-project
+https://docs.microsoft.com/en-us/azure/notification-hubs/push-notifications-android-specific-users-firebase-cloud-messaging

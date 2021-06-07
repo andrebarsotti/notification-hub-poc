@@ -1,0 +1,16 @@
+version: "3.9"
+   
+services:
+  web:
+    build: .
+    image: notificationhubpoc:latest
+    environment:
+      Configuracao para log no ApplicationInsights
+      # - AzureNotificationHub__ConnectionString=<connection string>
+      # - AzureNotificationHub__HubName=<hub name>
+      - AzureNotificationHub__ConnectionString=<connection string>
+      - AzureNotificationHub__HubName=<hub name>
+
+    ports:
+      - "8080:80"
+      - "8043:443"
