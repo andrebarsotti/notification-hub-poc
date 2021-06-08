@@ -28,3 +28,5 @@ Depois disso executar um o comando abaixo:
 # Fonte
 
 https://docs.microsoft.com/en-us/azure/notification-hubs/push-notifications-android-specific-users-firebase-cloud-messaging
+
+https://github.com/Azure/azure-notificationhubs-samples
