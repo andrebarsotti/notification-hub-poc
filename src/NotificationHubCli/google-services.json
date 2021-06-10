@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "587878758977",
+    "project_id": "notification-hub-estudos",
+    "storage_bucket": "notification-hub-estudos.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:587878758977:android:d162c7ce211588567924c0",
+        "android_client_info": {
+          "package_name": "com.estudonotificationhub.androidcli"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "587878758977-1nv9haefbi7deku9tenl2bq2fl14vddf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAhMP2v-wKEkXOwt1giBPrxY61LwLH80WU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "587878758977-1nv9haefbi7deku9tenl2bq2fl14vddf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
