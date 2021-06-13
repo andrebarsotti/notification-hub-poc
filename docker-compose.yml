@@ -5,8 +5,8 @@ services:
     build: .
     image: notificationhubpoc:latest
     environment:
-      - AzureNotificationHub__ConnectionString=${HubName}
-      - AzureNotificationHub__HubName=${HubConStr}
+      - AzureNotificationHub__ConnectionString=${HubConStr}
+      - AzureNotificationHub__HubName=${HubName}
 
     ports:
       - "8080:80"
